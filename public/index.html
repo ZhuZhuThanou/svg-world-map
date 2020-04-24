@@ -8,16 +8,20 @@
   <script src="assets/d3-save-svg.min.js"></script>
   <style>
     Button {
-      
       border-radius: 20px;
       padding: 1rem;
       background-color: #90ee90;
+    }
+
+    .download-icon {
+      font-size:12px;
+      color: purple;
     }
   </style>
 </head>
 
 <body>
-  <Button onclick="downloadSVG()">Download SVG World Map <i class="fas fa-download"></i></Button>
+  <Button onclick="downloadSVG()">Download SVG World Map <i class="fas fa-download download-icon"></i></Button>
   <svg>
   </svg>
   <script>
@@ -27,6 +31,9 @@
       const svgObject = initSVG();
       drawMap(svgObject);
     });
+    /**
+     * supporting functions
+    */
     function initSVG() {
       let width = 960, height = 960;
       const projection = d3.geo.mercator()
@@ -54,12 +61,12 @@
 
         const countryList = svgObject.svg.selectAll('path.subunit').data(subunitsFeatures).enter();
         countryList.insert('path', '.graticule')
-          .style('fill', heatColor)
+          .style('fill', applyHeatColor)
           .attr('d', svgObject.path);
       });
     }
 
-    function heatColor(countryData) {
+    function applyHeatColor(countryData) {
       const region = getRegionByCountryId(countryData.id);
       if (region === 'Asia' || region === 'SouthAmerica') {
         return '#5faead'; // green
@@ -79,14 +86,8 @@
     }
 
     function getRegionByCountryId(countryId) {
-      let region = null;
-      for (let i = 0; i < countryList.length; i++) {
-        if (countryId === countryList[i].id) {
-          region = countryList[i].region;
-          break;
-        }
-      }
-      return region;
+      let country = countryList.find(country => country.id == countryId);
+      return country ? country.region : "";
     }
   </script>
 </body>
