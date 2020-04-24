@@ -1,2 +1,7 @@
-# svg-world-map
-Angular take on world map
+# SvgWorldMap
+# Simple SVG World Map
+
+## to start
+```
+npm install
+```

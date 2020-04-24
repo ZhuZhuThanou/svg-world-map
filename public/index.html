@@ -1,0 +1,94 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG World Map JS</title>
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="//d3js.org/topojson.v1.min.js"></script>
+  <script src="//kit.fontawesome.com/a076d05399.js"></script>
+  <script src="assets/d3-save-svg.min.js"></script>
+  <style>
+    Button {
+      
+      border-radius: 20px;
+      padding: 1rem;
+      background-color: #90ee90;
+    }
+  </style>
+</head>
+
+<body>
+  <Button onclick="downloadSVG()">Download SVG World Map <i class="fas fa-download"></i></Button>
+  <svg>
+  </svg>
+  <script>
+    let countryList;
+    fetch("assets/countries.json").then(response => response.json()).then(json => {
+      countryList = json;
+      const svgObject = initSVG();
+      drawMap(svgObject);
+    });
+    function initSVG() {
+      let width = 960, height = 960;
+      const projection = d3.geo.mercator()
+        .scale((width + 1) / 2 / Math.PI)
+        .translate([width / 2, 650])
+        .precision(.1);
+      const path = d3.geo.path().projection(projection);
+      const graticule = d3.geo.graticule();
+      // SVG related definitions
+      const svg = d3.select('body').append('svg')
+        .attr({ 'width': width, 'height': height })
+        .append('g');
+      return {svg, path};
+    }
+    
+    function drawMap(svgObject) {
+      d3.json('assets/world.json', function (error, topology) {
+        if (error) return console.error(error);
+        const subunitsFeatures = topojson.feature(topology, topology.objects.subunits).features;
+        svgObject.svg.selectAll('path')
+          .data(subunitsFeatures)
+          .enter()
+          .append('path')
+          .attr('d', svgObject.path);
+
+        const countryList = svgObject.svg.selectAll('path.subunit').data(subunitsFeatures).enter();
+        countryList.insert('path', '.graticule')
+          .style('fill', heatColor)
+          .attr('d', svgObject.path);
+      });
+    }
+
+    function heatColor(countryData) {
+      const region = getRegionByCountryId(countryData.id);
+      if (region === 'Asia' || region === 'SouthAmerica') {
+        return '#5faead'; // green
+      } else if (region === 'Austrailasia' || region === 'NorthAmerica' || region === 'Africa') {
+        return '#005eb8'; // blue
+      } else if (region === 'Europe' || region === 'MiddleEast' || region === 'CentralAmerica') {
+        return '#8577b3'; // purple
+      } else {
+        return '#ccc';
+      }
+    }
+    function downloadSVG() {
+      var config = {
+        filename: 'cae-sentiment-world',
+      }
+      d3_save_svg.save(d3.select('svg').node(), config);
+    }
+
+    function getRegionByCountryId(countryId) {
+      let region = null;
+      for (let i = 0; i < countryList.length; i++) {
+        if (countryId === countryList[i].id) {
+          region = countryList[i].region;
+          break;
+        }
+      }
+      return region;
+    }
+  </script>
+</body>
+
+</html>
