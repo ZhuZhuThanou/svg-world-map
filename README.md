@@ -5,7 +5,7 @@
 > npm install
 > npm start 
 
-SVG World Map App listening on port 3000!
+SVG World Map App is ready! URL: http://localhost:3000
 
 ```
 <img src="sample-world.png">
