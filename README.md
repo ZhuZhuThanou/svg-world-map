@@ -2,7 +2,10 @@
 
 ## to start
 ```
-npm install
-npm start 
-// and voila!
+> npm install
+> npm start 
+
+SVG World Map App listening on port 3000!
+
 ```
+<img src="sample-world.png">
